@@ -4,6 +4,9 @@
 
 import { ctx, warn } from './util.js';
 
+// 自定义 OpenAI 兼容端点的 API 格式（宿主校验值，见 openai.js custom_api_formats.OPENAI_COMPAT）
+const CUSTOM_API_FORMAT = 'openai_compat';
+
 const SYSTEM_PROMPT = [
     '你是一个“原著检索词生成器”。',
     '根据给定的最近对话上下文，输出一条用于在原著语料库中做向量检索的简洁查询词。',
@@ -42,6 +45,7 @@ export async function writeQuery(contextText, llmSettings, signal = null) {
         model: llmSettings.model,
         chat_completion_source: 'custom',
         custom_url: llmSettings.endpoint,
+        custom_api_format: CUSTOM_API_FORMAT,
         secret_id: llmSettings.secretId,
         max_tokens: Number(llmSettings.maxTokens) || 200,
         temperature: Number.isFinite(Number(llmSettings.temperature)) ? Number(llmSettings.temperature) : 0.3,
@@ -87,7 +91,7 @@ export async function fetchModels(llmSettings) {
     const body = {
         chat_completion_source: 'custom',
         custom_url: llmSettings.endpoint,
-        custom_api_format: 'openai',
+        custom_api_format: CUSTOM_API_FORMAT,
         secret_id: llmSettings.secretId,
     };
 
