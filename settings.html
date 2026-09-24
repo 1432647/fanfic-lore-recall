@@ -11,6 +11,11 @@
                 生成召回词，做向量召回 + 重排，取原著片段注入提示词，帮助叙事模型把握文风与场景（不鼓励照抄原文）。
             </small>
 
+            <label class="checkbox_label fflr-master-switch" for="fflr_enabled">
+                <input id="fflr_enabled" type="checkbox" />
+                <b>启用插件（总开关）</b>
+            </label>
+
             <!-- ============ LLM 设置 ============ -->
             <div class="inline-drawer fflr-section">
                 <div class="inline-drawer-toggle inline-drawer-header">
@@ -23,7 +28,11 @@
                     <label for="fflr_llm_key">API Key</label>
                     <input id="fflr_llm_key" class="text_pole" type="password" autocomplete="off" placeholder="输入以保存/更新" />
                     <label for="fflr_llm_model">模型</label>
-                    <input id="fflr_llm_model" class="text_pole" type="text" placeholder="例如 gpt-4o-mini" />
+                    <div class="flex-container fflr-actions">
+                        <input id="fflr_llm_model" class="text_pole flex1" type="text" placeholder="例如 gpt-4o-mini" />
+                        <div id="fflr_llm_fetch" class="menu_button">拉取模型</div>
+                    </div>
+                    <select id="fflr_llm_model_select" class="text_pole" style="display:none;"></select>
                     <div class="flex-container">
                         <div class="flexFlowColumn flex1">
                             <label for="fflr_llm_maxtokens">最大 tokens</label>

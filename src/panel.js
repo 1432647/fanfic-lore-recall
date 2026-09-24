@@ -6,7 +6,7 @@ import { CUSTOM_SECRET_KEY, log, warn } from './util.js';
 import { getSettings, saveSettings, DEFAULT_WRAP_TEMPLATE } from './settings.js';
 import { testEmbedding } from './embedding.js';
 import { testRerank } from './rerank.js';
-import { testLlm } from './llm.js';
+import { testLlm, fetchModels } from './llm.js';
 import { buildLibrary, deleteLibrary, getLibraries, libraryStats } from './libraries.js';
 
 function setStatus(el, ok, msg) {
@@ -125,6 +125,55 @@ function bindTestButton(root, btnId, statusEl, fn) {
         setStatus(statusEl, true, '测试中…');
         const res = await fn();
         setStatus(statusEl, res.ok, (res.ok ? '[OK] ' : '[X] ') + res.message + (res.sample ? `\n样例：${res.sample}` : ''));
+    });
+}
+
+/** 拉取 LLM 模型列表并填充下拉框 */
+function bindModelFetch(root) {
+    const btn = root.querySelector('#fflr_llm_fetch');
+    const select = root.querySelector('#fflr_llm_model_select');
+    const input = root.querySelector('#fflr_llm_model');
+    const statusEl = root.querySelector('#fflr_llm_status');
+    if (!btn || !select || !input) return;
+    const settings = getSettings();
+
+    // 选择下拉项 → 写回输入框与配置
+    select.addEventListener('change', () => {
+        if (!select.value) return;
+        input.value = select.value;
+        settings.llm.model = select.value;
+        saveSettings();
+    });
+
+    btn.addEventListener('click', async () => {
+        setStatus(statusEl, true, '拉取模型中…');
+        btn.classList.add('disabled');
+        try {
+            const models = await fetchModels(settings.llm);
+            select.innerHTML = '';
+            if (!models.length) {
+                select.style.display = 'none';
+                setStatus(statusEl, false, '端点未返回任何模型');
+                return;
+            }
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = `— 选择模型（共 ${models.length}） —`;
+            select.appendChild(placeholder);
+            for (const id of models) {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = id;
+                if (id === settings.llm.model) opt.selected = true;
+                select.appendChild(opt);
+            }
+            select.style.display = '';
+            setStatus(statusEl, true, `已拉取 ${models.length} 个模型，请在下拉框选择`);
+        } catch (e) {
+            setStatus(statusEl, false, '拉取失败：' + String(e?.message || e));
+        } finally {
+            btn.classList.remove('disabled');
+        }
     });
 }
 
@@ -294,6 +343,9 @@ function bindBuild(root) {
 export async function mountPanel(root) {
     const settings = getSettings();
 
+    // 总开关
+    bindCheckbox(root, 'fflr_enabled', settings, 'enabled');
+
     // LLM
     bindInput(root, 'fflr_llm_endpoint', settings.llm, 'endpoint');
     bindInput(root, 'fflr_llm_model', settings.llm, 'model');
@@ -301,6 +353,7 @@ export async function mountPanel(root) {
     bindInput(root, 'fflr_llm_temp', settings.llm, 'temperature', { float: true });
     bindLlmKey(root, root.querySelector('#fflr_llm_status'));
     bindTestButton(root, 'fflr_llm_test', root.querySelector('#fflr_llm_status'), () => testLlm(settings.llm));
+    bindModelFetch(root);
 
     // Embedding
     bindInput(root, 'fflr_emb_endpoint', settings.embedding, 'endpoint');

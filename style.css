@@ -12,6 +12,13 @@
     line-height: 1.4;
 }
 
+.fflr-settings .fflr-master-switch {
+    margin: 4px 0 10px;
+    padding: 6px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+}
+
 .fflr-settings label {
     display: block;
     margin-top: 6px;

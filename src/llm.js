@@ -69,3 +69,46 @@ export async function testLlm(llmSettings) {
         return { ok: false, message: String(e?.message || e) };
     }
 }
+
+/**
+ * 拉取 LLM 端点可用模型列表。
+ * 走宿主 /api/backends/chat-completions/status（经 Rust，免 CORS，用 secret_id 取密钥）。
+ * @param {object} llmSettings settings.llm
+ * @returns {Promise<string[]>} 模型 id 列表
+ */
+export async function fetchModels(llmSettings) {
+    if (!llmSettings?.endpoint) {
+        throw new Error('未配置 LLM 端点');
+    }
+    if (!llmSettings?.secretId) {
+        throw new Error('未配置 LLM API Key（请先在上方输入并保存密钥）');
+    }
+
+    const body = {
+        chat_completion_source: 'custom',
+        custom_url: llmSettings.endpoint,
+        custom_api_format: 'openai',
+        secret_id: llmSettings.secretId,
+    };
+
+    const response = await fetch('/api/backends/chat-completions/status', {
+        method: 'POST',
+        headers: ctx().getRequestHeaders(),
+        body: JSON.stringify(body),
+        cache: 'no-cache',
+    });
+
+    if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new Error(`状态检查失败 ${response.status}：${text.slice(0, 200)}`);
+    }
+
+    const json = await response.json();
+    if (json?.error) {
+        throw new Error(String(json.message || '端点返回错误'));
+    }
+    const list = Array.isArray(json?.data) ? json.data : [];
+    const ids = list.map((m) => (typeof m === 'string' ? m : m?.id)).filter(Boolean);
+    // 去重 + 排序
+    return [...new Set(ids)].sort();
+}

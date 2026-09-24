@@ -16,6 +16,7 @@ export const DEFAULT_WRAP_TEMPLATE =
 export const PASSAGE_TEMPLATE = '<片段 来源="{{source}}·{{chapter}}" 相关度="{{score}}">{{text}}</片段>';
 
 export const DEFAULTS = {
+    enabled: true,
     llm: {
         endpoint: '',
         secretId: '',

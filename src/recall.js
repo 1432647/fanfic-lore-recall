@@ -82,6 +82,12 @@ export async function intercept(chat, _contextSize, _abort, type) {
         warn('清空注入失败（忽略）', e);
     }
 
+    // 总开关：关闭时不做任何召回
+    if (!settings.enabled) {
+        debug('插件已关闭，跳过召回');
+        return;
+    }
+
     // 跳过后台/工具类静默生成
     if (type === 'quiet') {
         return;
