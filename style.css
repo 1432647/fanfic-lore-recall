@@ -1,0 +1,74 @@
+.fflr-settings .fflr-section {
+    margin-top: 8px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+.fflr-settings .fflr-hint {
+    display: block;
+    opacity: 0.8;
+    margin: 4px 0 8px;
+    line-height: 1.4;
+}
+
+.fflr-settings label {
+    display: block;
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.fflr-settings .fflr-actions {
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.fflr-settings .fflr-status {
+    font-size: 0.85em;
+    opacity: 0.9;
+    white-space: pre-wrap;
+}
+
+.fflr-settings .fflr-status.ok {
+    color: var(--active, #6c6);
+}
+
+.fflr-settings .fflr-status.err {
+    color: var(--warning, #e66);
+}
+
+.fflr-settings .fflr-lib-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.fflr-settings .fflr-lib-item {
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.fflr-settings .fflr-lib-item .fflr-lib-meta {
+    font-size: 0.85em;
+    opacity: 0.85;
+    line-height: 1.35;
+}
+
+.fflr-settings .fflr-lib-item .fflr-lib-buttons {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.fflr-settings .fflr-lib-empty {
+    opacity: 0.7;
+    font-style: italic;
+}

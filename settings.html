@@ -1,0 +1,203 @@
+<div class="fflr-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>同人原著向量召回 (Fanfic Lore Recall)</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+
+            <small class="fflr-hint">
+                上传原著 txt → 向量化建库 → 绑定角色卡/聊天/全局。使用该角色卡时，每次发送后由插件自己的 LLM
+                生成召回词，做向量召回 + 重排，取原著片段注入提示词，帮助叙事模型把握文风与场景（不鼓励照抄原文）。
+            </small>
+
+            <!-- ============ LLM 设置 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>LLM 设置（召回词生成）</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label for="fflr_llm_endpoint">端点 URL（自定义 OpenAI 兼容 /v1）</label>
+                    <input id="fflr_llm_endpoint" class="text_pole" type="text" placeholder="https://your-endpoint/v1" />
+                    <label for="fflr_llm_key">API Key</label>
+                    <input id="fflr_llm_key" class="text_pole" type="password" autocomplete="off" placeholder="输入以保存/更新" />
+                    <label for="fflr_llm_model">模型</label>
+                    <input id="fflr_llm_model" class="text_pole" type="text" placeholder="例如 gpt-4o-mini" />
+                    <div class="flex-container">
+                        <div class="flexFlowColumn flex1">
+                            <label for="fflr_llm_maxtokens">最大 tokens</label>
+                            <input id="fflr_llm_maxtokens" class="text_pole" type="number" min="1" />
+                        </div>
+                        <div class="flexFlowColumn flex1">
+                            <label for="fflr_llm_temp">温度</label>
+                            <input id="fflr_llm_temp" class="text_pole" type="number" min="0" max="2" step="0.1" />
+                        </div>
+                    </div>
+                    <div class="flex-container fflr-actions">
+                        <div id="fflr_llm_test" class="menu_button">测试连接</div>
+                        <span id="fflr_llm_status" class="fflr-status"></span>
+                    </div>
+                    <small>首次调用某新端点会弹一次原生“允许自定义端点”确认框（一次性）。</small>
+                </div>
+            </div>
+
+            <!-- ============ Embedding 设置 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Embedding 设置（直连 Jina）</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label for="fflr_emb_endpoint">端点 URL</label>
+                    <input id="fflr_emb_endpoint" class="text_pole" type="text" placeholder="https://api.jina.ai/v1/embeddings" />
+                    <label for="fflr_emb_key">API Key</label>
+                    <input id="fflr_emb_key" class="text_pole" type="password" autocomplete="off" placeholder="输入以保存/更新" />
+                    <label for="fflr_emb_model">模型</label>
+                    <input id="fflr_emb_model" class="text_pole" type="text" placeholder="jina-embeddings-v3" />
+                    <label for="fflr_emb_dim">维度 dimensions（可空，留空用模型默认）</label>
+                    <input id="fflr_emb_dim" class="text_pole" type="number" min="1" placeholder="留空=默认(1024)" />
+                    <div class="flex-container fflr-actions">
+                        <div id="fflr_emb_test" class="menu_button">测试</div>
+                        <span id="fflr_emb_status" class="fflr-status"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ Rerank 设置 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Rerank 设置（直连 Jina）</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label class="checkbox_label" for="fflr_rr_enabled">
+                        <input id="fflr_rr_enabled" type="checkbox" />
+                        <span>启用重排序</span>
+                    </label>
+                    <label for="fflr_rr_endpoint">端点 URL</label>
+                    <input id="fflr_rr_endpoint" class="text_pole" type="text" placeholder="https://api.jina.ai/v1/rerank" />
+                    <label for="fflr_rr_key">API Key</label>
+                    <input id="fflr_rr_key" class="text_pole" type="password" autocomplete="off" placeholder="输入以保存/更新" />
+                    <label for="fflr_rr_model">模型</label>
+                    <input id="fflr_rr_model" class="text_pole" type="text" placeholder="jina-reranker-v2-base-multilingual" />
+                    <label for="fflr_rr_topn">topN（最终注入片段数）</label>
+                    <input id="fflr_rr_topn" class="text_pole" type="number" min="1" />
+                    <div class="flex-container fflr-actions">
+                        <div id="fflr_rr_test" class="menu_button">测试</div>
+                        <span id="fflr_rr_status" class="fflr-status"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ 检索设置 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>检索设置</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label for="fflr_ret_topk">topK（重排前候选数）</label>
+                    <input id="fflr_ret_topk" class="text_pole" type="number" min="1" />
+                    <label for="fflr_ret_minscore">minScore（最低分，0=不过滤）</label>
+                    <input id="fflr_ret_minscore" class="text_pole" type="number" step="0.01" />
+                    <label class="checkbox_label" for="fflr_ret_hybrid">
+                        <input id="fflr_ret_hybrid" type="checkbox" />
+                        <span>启用向量+文本(BM25)混合检索</span>
+                    </label>
+                    <div class="flex-container">
+                        <div class="flexFlowColumn flex1">
+                            <label for="fflr_ret_bm25k1">bm25K1（可空）</label>
+                            <input id="fflr_ret_bm25k1" class="text_pole" type="number" step="0.1" placeholder="默认" />
+                        </div>
+                        <div class="flexFlowColumn flex1">
+                            <label for="fflr_ret_bm25b">bm25B（可空）</label>
+                            <input id="fflr_ret_bm25b" class="text_pole" type="number" step="0.1" placeholder="默认" />
+                        </div>
+                        <div class="flexFlowColumn flex1">
+                            <label for="fflr_ret_textboost">textBoost（可空）</label>
+                            <input id="fflr_ret_textboost" class="text_pole" type="number" step="0.1" placeholder="默认" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ 切块设置 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>切块设置</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label for="fflr_chunk_target">目标 tokens/块</label>
+                    <input id="fflr_chunk_target" class="text_pole" type="number" min="50" />
+                    <label for="fflr_chunk_overlap">重叠比例 (0~0.9)</label>
+                    <input id="fflr_chunk_overlap" class="text_pole" type="number" min="0" max="0.9" step="0.05" />
+                    <label for="fflr_chunk_chapter">章节正则（可空，命中行作硬边界并记为 chapter）</label>
+                    <input id="fflr_chunk_chapter" class="text_pole" type="text" placeholder="例如 ^第.{1,8}章" />
+                </div>
+            </div>
+
+            <!-- ============ 上下文 / 注入设置 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>上下文 / 注入设置</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label for="fflr_ctx_floors">上下文层数 floors（当前输入 + 上 N 层）</label>
+                    <input id="fflr_ctx_floors" class="text_pole" type="number" min="0" />
+                    <label for="fflr_inj_position">注入位置 position</label>
+                    <select id="fflr_inj_position" class="text_pole">
+                        <option value="0">IN_PROMPT (故事串之后)</option>
+                        <option value="1">IN_CHAT (对话内, 用 depth 指定深度)</option>
+                        <option value="2">BEFORE_PROMPT (提示词之前)</option>
+                    </select>
+                    <label for="fflr_inj_depth">注入深度 depth</label>
+                    <input id="fflr_inj_depth" class="text_pole" type="number" min="0" />
+                    <label for="fflr_inj_role">注入角色 role</label>
+                    <select id="fflr_inj_role" class="text_pole">
+                        <option value="0">SYSTEM</option>
+                        <option value="1">USER</option>
+                        <option value="2">ASSISTANT</option>
+                    </select>
+                    <label for="fflr_inj_cap">每片段最大字符数 perPassageCharCap</label>
+                    <input id="fflr_inj_cap" class="text_pole" type="number" min="50" />
+                    <label for="fflr_inj_template">包裹模板（可用 {{passages}} 占位）</label>
+                    <textarea id="fflr_inj_template" class="text_pole" rows="6"></textarea>
+                    <div class="flex-container fflr-actions">
+                        <div id="fflr_inj_reset" class="menu_button">恢复默认模板</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ 库管理 ============ -->
+            <div class="inline-drawer fflr-section">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>库管理</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content">
+                    <label for="fflr_lib_name">新建库 · 名称</label>
+                    <input id="fflr_lib_name" class="text_pole" type="text" placeholder="库显示名" />
+                    <label for="fflr_lib_scope">绑定范围</label>
+                    <select id="fflr_lib_scope" class="text_pole">
+                        <option value="character">角色卡（当前角色）</option>
+                        <option value="chat">聊天（当前聊天）</option>
+                        <option value="global">全局</option>
+                    </select>
+                    <label for="fflr_lib_file">原著 txt 文件</label>
+                    <input id="fflr_lib_file" class="text_pole" type="file" accept=".txt,text/plain" />
+                    <div class="flex-container fflr-actions">
+                        <div id="fflr_lib_build" class="menu_button">建库</div>
+                        <span id="fflr_lib_progress" class="fflr-status"></span>
+                    </div>
+                    <hr />
+                    <b>已建库</b>
+                    <div id="fflr_lib_list" class="fflr-lib-list"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

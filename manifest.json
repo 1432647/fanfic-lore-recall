@@ -1,0 +1,15 @@
+{
+    "display_name": "同人原著向量召回 (Fanfic Lore Recall)",
+    "loading_order": 101,
+    "requires": [],
+    "optional": [],
+    "generate_interceptor": "fanficLoreRecall_intercept",
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Kilo",
+    "version": "1.0.0",
+    "homePage": "",
+    "hooks": {
+        "activate": "init"
+    }
+}
